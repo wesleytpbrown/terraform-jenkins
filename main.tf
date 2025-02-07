@@ -1,14 +1,18 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
   }
 }
 
+# Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1" # AWS region you want your resources
+  region = "us-east-1" #AWS region you want your resources
 }
+
+
 
 # Get Default VPC
 data "aws_vpc" "default" {
@@ -19,6 +23,8 @@ data "aws_vpc" "default" {
 variable "subnet_id" {
   default = "subnet-02f8d8e5cfbbd3677" # Replace with your specific subnet ID
 }
+
+
 
 
 # Security Group for Jenkins
@@ -57,17 +63,35 @@ resource "aws_s3_bucket" "jenkins_artifacts" {
 }
 
 
+
+
 # EC2 Instance for Jenkins
+resource "aws_instance" "jenkins-server"{
+  ami           = "ami-04b4f1a9cf54c11d0"
+  instance_type = "t2.medium"
+  key_name      = "dockerkey.pem" # Replace with your key pair
+  vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
+  subnet_id              = var.subnet_id # Specify your subnet
+  user_data = file("${path.module}/jekins-user-data.sh") # Here reference your script from eariler
+
+
+  tags = {
+    Name = "terraformjenkins"
+  }
+}
+
+
+
+
 resource "aws_instance" "jenkins_server" {
   ami                    = "ami-04b4f1a9cf54c11d0"
   instance_type          = "t2.medium"
-  key_name               = "dockerkey.pem" # Replace with your key pair
-  vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
-  subnet_id              = var.subnet_id # Specify your subnet
+  
+
+  
 
 
-  user_data = file("${path.module}/jekins-user-data.sh") # Here reference your script from eariler
-
+  
   tags = {
     Name = "Jenkins-Server"
   }
