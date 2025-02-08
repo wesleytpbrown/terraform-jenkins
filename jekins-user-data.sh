@@ -19,7 +19,3 @@ sudo apt install -y jenkins
 # Start and enable Jenkins service
 sudo systemctl enable jenkins
 sudo systemctl start jenkins
-
-# Open port 8080 for Jenkins using UFW (Ubuntu firewall)
-sudo ufw allow 8080/tcp
-sudo ufw --force enable
