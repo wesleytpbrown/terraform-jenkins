@@ -20,7 +20,7 @@ resource "aws_instance" "jenkins-server" {
   instance_type          = "t2.micro"
   key_name               = "dockerkey" # Replace with your key pair
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
-  user_data              = file("jekins-user-data.sh")
+  user_data              = file("jenkins-ud.sh")
 
 
   tags = {
@@ -34,7 +34,7 @@ resource "aws_instance" "jenkins-server" {
 resource "aws_security_group" "jenkins_sg" {
   name        = "jenkins-SG"
   description = "Allow SSH and 8080 traffic"
-  
+
 
 
 
@@ -81,9 +81,9 @@ resource "aws_s3_bucket" "jenkins_artifacts" {
 
 #Access control list for your bucket
 resource "aws_s3_bucket_acl" "jenkins_artifacts_acl" {
-  bucket = aws_s3_bucket.jenkins_artifacts.id
+  bucket     = aws_s3_bucket.jenkins_artifacts.id
   depends_on = [aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership]
-  acl    = "private"
+  acl        = "private"
 }
 
 
