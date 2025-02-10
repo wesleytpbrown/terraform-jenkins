@@ -20,8 +20,7 @@ resource "aws_instance" "jenkins-server" {
   instance_type          = "t2.micro"
   key_name               = "dockerkey" # Replace with your key pair
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
-  subnet_id              = "subnet-02f8d8e5cfbbd3677"
-  user_data              = file("jekins-user-data.sh") # Here reference your script from eariler
+  user_data              = file("jekins-user-data.sh")
 
 
   tags = {
@@ -33,9 +32,9 @@ resource "aws_instance" "jenkins-server" {
 
 # Security Group for Jenkins
 resource "aws_security_group" "jenkins_sg" {
-  name        = "jenkins-terraform-SG"
-  description = "Allow SSH and Jenkins traffic"
-  vpc_id      = "vpc-052b92edb0bb18a18"
+  name        = "jenkins-SG"
+  description = "Allow SSH and 8080 traffic"
+  
 
 
 
@@ -74,4 +73,23 @@ resource "aws_security_group" "jenkins_sg" {
 # S3 Bucket for Jenkins Artifacts
 resource "aws_s3_bucket" "jenkins_artifacts" {
   bucket = "jenkins-terraform-bucket" # Change to a unique name
+
+  tags = {
+    Name = "terraform-bucket"
+  }
+}
+
+#Access control list for your bucket
+resource "aws_s3_bucket_acl" "jenkins_artifacts_acl" {
+  bucket = aws_s3_bucket.jenkins_artifacts.id
+  depends_on = [aws_s3_bucket_ownership_controls.s3_bucket_acl_ownership]
+  acl    = "private"
+}
+
+
+resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
+  bucket = aws_s3_bucket.jenkins_artifacts.id
+  rule {
+    object_ownership = "ObjectWriter"
+  }
 }
