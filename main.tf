@@ -36,8 +36,6 @@ resource "aws_security_group" "jenkins_sg" {
   description = "Allow SSH and 8080 traffic"
 
 
-
-
   # Allow SSH (port 22)
   ingress {
     from_port   = 22
